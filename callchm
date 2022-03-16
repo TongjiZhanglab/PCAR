@@ -153,7 +153,7 @@ else
 	java -Xmx50g -jar ${ChromHMM_PATH} LearnModel -b ${BinSize} -init random -p ${Threads} Binarized_Cooccupancy_${Name} Output_${Name} 2 ${GenomeVer}
 	cd ${OutDir}/Output_${Name}
 	State=$(tail -n +2 emissions_2_999.txt | awk 'BEGIN{FS=OFS="\t";S="E1";MAX=-1;}{if($2>MAX){MAX=$2;S=$1}}END{print "E"S}')
-	tail -n +2 ${Name}_2_999_segments.bed | grep -w ${State} | cut -f 1-3 | sort -k1,1 -k2,2n | mergeBed -i - -d 2000 | awk 'BEGIN{FS=OFS="\t"}{if($3-$2>=600){print }}' > ../${Name}.CHM.bed
+	tail -n +2 ${Name}_2_999_segments.bed | grep -w ${State} | cut -f 1-3 | sort -k1,1 -k2,2n | mergeBed -i - -d 2000 | awk 'BEGIN{FS=OFS="\t"}{if($3-$2>=600 && $2!=0){print }}' > ../${Name}.CHM.bed
 	
 	
 	# step6. remove temporary files

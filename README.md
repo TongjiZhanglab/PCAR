@@ -109,7 +109,7 @@ The CHMs identified are saved in the Test.CHM.bed. *callchm* based on *[Test_cal
 | chr1 | 5047000 | 5047600 | 0.49 | 0.81 | 0.08 | 0.27 | 0.13 | 0.42 | 0.03 | 0.28 | ... |
 | chr1 | 5071800 | 5073000 | 0.19 | 0.70 | 0.12 | 0.01 | 0.02 | 0.74 | 0.16 | 0.88 | ... |
 
-* Expr_genes.promoter.txt, Expr_transposableElements.promoter.txt containing expression information in log<sub>2</sub> (FPKM+1) in at least 2 stages. Format is tab-separated as follows:
+* Expr_genes.promoter.txt, Expr_transposableElements.promoter.txt containing expression information in log<sub>2</sub> (FPKM+1) in at least 2 stages. .Format is tab-separated as follows:
 
 | #Chrom_promoter | Start_promoter | End_promoter | GeneName | E_mat_stage<sub>1</sub> | E_pat_stage<sub>1</sub> | E_mat_stage<sub>2</sub> | E_pat_stage<sub>2</sub> |  ... |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -119,6 +119,8 @@ The CHMs identified are saved in the Test.CHM.bed. *callchm* based on *[Test_cal
 | chr1 | 4358314 | 4362314 | NM_011283 | 0.19 | 0.00 | 0.00 | 0.01 | ... |
 | chr1 | 4495354 | 4499354 | NM_001289464 | 0.00 | 0.00 | 0.00 | 0.00 | ... |
 | chr1 | 4495354 | 4499354 | NM_001289465 | 0.00 | 0.00 | 0.00 | 0.00 | ... |
+
+Note: Transposable element transcripts annotation are assembled in pre-implantation embryos as [Shao et al](https://github.com/wanqingshao/TE_expression_in_scRNAseq) and stored in [mm10_te_tx.gff3](https://github.com/hyang-bio/PCAR/tree/main/Test/Test_scoreasr/mm10_te_tx.gff3). 
 
 * Zfp57motif.methyl.txt containing DNA methylation information of Zfp57 motifs. Format is tab-separated as follows:
 

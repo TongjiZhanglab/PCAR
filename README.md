@@ -65,14 +65,17 @@ $ pcar -m callchm -H H3K9me3.rmDup.bam -M methyl.sam.G.bed -Z genomesize -Q geno
 
 Options:
 -H, --h3k9me3 HFILE     H3K9me3 ChIP-seq sequence alighment after removing duplicates. REQUIRED.
+-C, --control CFILE	Input ChIP-seq sequence alignment after removing duplicates. Defalt: "".
 -M, --methyl MFILE      DNA methylation level of CpG sites estimated using mcall. REQUIRED.
 -Z, --gsiz ZFILE        Two-column file: <chromosome name><tab><size in bases> downloaded from UCSC. REQUIRED.
 -Q, --gseq QFILE        Genome sequence file in twoBit format downloaded from UCSC. REQUIRED.
 -G, --gver GVER         Genome build version. Default: mm10.
 -B, --binsize <int>     The number of base pair in a bin determining the resolution of the model learning and segmentation. Default: 200 base pairs.
+-P, --poissonthresh <float>	This option specifies the tail probability of the poisson distribution that the binarization threshold should correspond to. Default: 0.0001.
 -N, --name NAME         Name will be used to generate file names. Default: NA.
 -T, --threads <int>     Number of threads to use. Default: 1.
 -O, --outdir OUTDIR     If specified all output files will be written to that directory. Default: the currenting working directory.
+-D, --definition <CHM|CH-nonM|CM-nonH>		Choosing the definition of region to be called. Default: CHM.
 ```
 
 ## Module *scoreasr* : scoring allele-specific regulatory potential

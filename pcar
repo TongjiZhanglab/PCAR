@@ -4,21 +4,25 @@ ProgName=$(basename $0)
 
 help_print(){
 	cat <<EOF
+PCAR version 0.1.0
 Usage: 	$ProgName -m <callchm|scoreasr> [options]
 	-h, --help -- help information
-
+	-v, --version -- version information
 
 Module:	callchm		Calling CpG-rich genomic loci with high H3K9me3 signal and DNA methylation level (CHM)
 Options:
  -H, --h3k9me3 HFILE	H3K9me3 ChIP-seq sequence alignment after removing duplicates. REQUIRED.
+ -C, --control CFILE	Input ChIP-seq sequence alignment after removing duplicates. Defalt: "".
  -M, --methyl MFILE	DNA methylation level of each CpG site estimated using mcall. REQUIRED.
  -Z, --gsiz ZFILE	Two-column file: <chromosome name><tab><size in bases> downloaded from UCSC. REQUIRED.
  -Q, --gseq QFILE	Genome sequence file in twoBit format downloaded from UCSC. REQUIRED.
  -G, --gver GVER	Genome build version. Default: mm10.
  -B, --binsize <int>	The number of base pair in a bin determing the resolution ofthe model learning and segmentation. Default: 200 base pairs.
+ -P, --poissonthresh <float>	This option specifies the tail probability of the poisson distribution that the binarization threshold should correspond to. Default: 0.0001.
  -N, --name NAME	Name will be used to generate file names. Default: NA.
  -T, --threads <int>	Number of threads to use. Default: 1.
- -O, --outdir OUTDIR	If specified all output files will be written to that directory. Default: the current working directory
+ -O, --outdir OUTDIR	If specified all output files will be written to that directory. Default: the current working directory.
+ -D, --definition <CHM|CH-nonM|CM-nonH>		Choosing the definition of region to be called. Default: CHM.
 
 
 Module:	scoreasr	Scoring regions for their allele-specific regulatory role during pre-implantation embryogenesis
@@ -31,6 +35,12 @@ Options:
 EOF
 }
 
+version_print(){
+	cat <<EOF
+PCAR version 0.1.0
+EOF
+}
+
 
 if [ $# = 0 ]
 then
@@ -39,22 +49,26 @@ then
 fi
 # default parameters
 H3K9me3="-"
+Control="-"
 Methyl="-"
 GenomeVer="mm10"
 GenomeSiz="-"
 GenomeSeq="-"
 BinSize=200
+Poissonthresh=0.0001
 ASEpi="epi.txt"
 ASExprDir=$(pwd)
 ReguDir=$(pwd)
 Name=NA
 Threads=1
 OutDir=$(pwd)
+Definition="CHM"
 help=0
+version=0
 
 
 # get command line parameters
-ARGS=$(getopt -o m:H:M:Z:Q:G:B:N:T:O:I:R:U:h -l module:,h3k9me3:,methyl:,gsiz:,gseq:,gver:,binsize:,name:,threads:,asepi:,asexpr:,regu:,help -n 'pcar' -- "$@")
+ARGS=$(getopt -o m:H:C:M:Z:Q:G:B:P:N:T:O:D:I:R:U:h:v -l module:,h3k9me3:,control:,methyl:,gsiz:,gseq:,gver:,binsize:,poissonthresh:,name:,threads:,outdir:,definition:,asepi:,asexpr:,regu:,help:,version -n 'pcar' -- "$@")
 eval set -- "${ARGS}"
 unset ARGS
 
@@ -66,6 +80,8 @@ do
 			MODULE=${2};shift 2;;
 		-H | --h3k9me3)
 			H3K9me3=${2};shift 2;;
+		-C | --control)
+			Control=${2};shift 2;;
 		-M | --methyl)
 			Methyl=${2};shift 2;;
 		-Z | --gsiz)
@@ -76,12 +92,16 @@ do
 			GenomeVer=${2};shift 2;;
 		-B | --binsize)
 			BinSize=${2};shift 2;;
+		-P | --poissonthresh)
+			Poissonthresh=${2};shift 2;;
 		-N | --name)
 			Name=${2};shift 2;;
 		-T | --threads)
 			Threads=${2};shift 2;;
 		-O | --outdir)
 			OutDir=${2};shift 2;;
+		-D | --definition)
+			Definition=${2};shift 2;;
 		-I | --asepi)
 			ASEpi=${2};shift 2;;
 		-R | --asexpr)
@@ -90,6 +110,8 @@ do
 			ReguDir=${2};shift 2;;
 		-h | --help)
 			help_print;exit 1;;
+		-v | --version)
+			version_print;exit 1;;
 		--)
 			shift
 			break
@@ -111,18 +133,21 @@ then
 	cat <<PARA
 pcar module: 		${MODULE}
 H3K9me3 bam file:	${H3K9me3}
+Control bam file:	${Control}
 Methylation file: 	${Methyl}
 Genome size file:	${GenomeSiz}
 Genome sequence file:	${GenomeSeq}
 Genome version:		${GenomeVer}
 Bin size:		${BinSize}
+Poisson threshold:		${Poissonthresh}
 Prefix of output file:	${Name}
 Number of threads: 	${Threads}
 Output directory:	${OutDir}
+Definition of region:	${Definition}
 PARA
 	if [ "${H3K9me3}" != "-" ] && [ "${Methyl}" != "-" ] && [ "${GenomeSiz}" != "-" ] && [ "${GenomeSeq}" != "-" ]
 	then
-		callchm -H ${H3K9me3} -M ${Methyl} -Z ${GenomeSiz} -Q ${GenomeSeq} -G ${GenomeVer} -B ${BinSize} -N ${Name} -T ${Threads} -O ${OutDir}
+		callchm -H ${H3K9me3} -C ${Control} -M ${Methyl} -Z ${GenomeSiz} -Q ${GenomeSeq} -G ${GenomeVer} -B ${BinSize} -P ${Poissonthresh} -N ${Name} -T ${Threads} -O ${OutDir} -D ${Definition}
 	else
 		echo -e "\n\n\n#########################################################################################\n\n\npcar callchm error: argument -H/--h3k9me3, -M/--methyl, -Z/--gsiz, -Q/--gseq are requried\n\n\n#########################################################################################\n\n\n"
 		callchm -h
@@ -146,7 +171,7 @@ PARA
 		echo -e "\n\n\n#########################################################################################\n\n\npcar scoreasr error: Please check whether necessary information are provided!!!\n\n\n#########################################################################################\n\n\n"
 		scoreasr -h
 	fi
-	
+
 	# if [ $?!=0 ]
 	# then
 	# 	scoreasr -h
